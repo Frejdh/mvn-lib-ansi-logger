@@ -30,12 +30,14 @@ public class AnsiLogger {
 
 	// Init
 	@PostConstruct
-	public void initProperties() {
+	public void initProperties() { // If spring-boot is used, load the defined properties
 		properties = autowiredProperties;
 		timestampFormat = new SimpleDateFormat(properties.getTimestamp().getFormat());
 	}
 
 	static {
+		properties = new AnsiProperties();
+		timestampFormat = new SimpleDateFormat(properties.getTimestamp().getFormat());
 		printStream = System.out;
 	}
 

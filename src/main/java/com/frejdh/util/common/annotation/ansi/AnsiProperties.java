@@ -20,6 +20,13 @@ public class AnsiProperties {
 	//
 	private Timestamp timestamp;
 
+	public Timestamp getTimestamp() {
+		if (timestamp == null) { // If not using spring-boot...
+			timestamp = new Timestamp();
+		}
+		return timestamp;
+	}
+
 	//
 	// Nested property classes
 	//
