@@ -24,7 +24,7 @@ ansi.logging.timestamp.enabled=[true|false]
 <repositories> <!-- Required in order to resolve this package -->
     <repository>
         <id>mvn-lib-common-ansi-logger</id>
-        <url>https://raw.github.com/Frejdh/mvn-lib-common-toolbox/mvn-repo/</url>
+        <url>https://raw.github.com/Frejdh/mvn-lib-ansi-logger/mvn-repo/</url>
     </repository>
 </repositories>
 ```
