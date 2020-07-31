@@ -1,4 +1,4 @@
-package com.frejdh.util.common.annotation.ansi;
+package com.frejdh.util.common.ansi.annotation;
 
 import lombok.Data;
 import lombok.ToString;

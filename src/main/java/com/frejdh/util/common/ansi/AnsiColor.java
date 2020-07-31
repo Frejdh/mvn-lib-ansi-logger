@@ -1,12 +1,13 @@
-package com.frejdh.util.common;
+package com.frejdh.util.common.ansi;
 
+import com.frejdh.util.common.ansi.builder.BitDepth;
 import java.util.Arrays;
 import java.util.NoSuchElementException;
 
 /**
  * Replacement of the Spring implementation of AnsiColor. Primary usage is with {@link AnsiOutput} but provides some additional methods
  */
-public enum AnsiColor implements AnsiCodeInterface {
+public enum AnsiColor implements AnsiColorInterface {
 
 	DEFAULT(39),
 
@@ -24,7 +25,7 @@ public enum AnsiColor implements AnsiCodeInterface {
 
 	CYAN(36),
 
-	WHITE(37),
+	GRAY(37),
 
 	BRIGHT_BLACK(90),
 
@@ -40,12 +41,26 @@ public enum AnsiColor implements AnsiCodeInterface {
 
 	BRIGHT_CYAN(96),
 
-	BRIGHT_WHITE(97);
+	WHITE(97),
 
-	private final int colorCode;
+	// 8-bit colors below
+	BRIGHT_GRAY(BitDepth.EIGHT, 244),
 
-	AnsiColor(int colorCode) {
-		this.colorCode = colorCode;
+	LIME(BitDepth.EIGHT, 118);
+
+
+	// Variables
+	public final int code;
+	public final BitDepth bitDepth;
+
+	AnsiColor(int code) {
+		this.code = code;
+		this.bitDepth = BitDepth.FOUR;
+	}
+
+	AnsiColor(BitDepth bitDepth, int code) {
+		this.code = code;
+		this.bitDepth = bitDepth;
 	}
 
 	/**
@@ -54,13 +69,29 @@ public enum AnsiColor implements AnsiCodeInterface {
 	 */
 	@Override
 	public int getCode() {
-		return colorCode;
+		return code;
 	}
+
+	@Override
+	public int getBitDepth() {
+		return bitDepth.getValue();
+	}
+
+	@Override
+	public boolean isForeground() {
+		return true;
+	}
+
+	@Override
+	public boolean isBackground() {
+		return false;
+	}
+
 
 	@SuppressWarnings("OptionalGetWithoutIsPresent")
 	public static AnsiColor colorCodeToEnum(int colorCode) {
 		try {
-			return Arrays.stream(AnsiColor.values()).filter(e -> e.colorCode == colorCode).findFirst().get();
+			return Arrays.stream(AnsiColor.values()).filter(e -> e.code == colorCode).findFirst().get();
 		}
 		catch (NoSuchElementException e) {
 			return null;

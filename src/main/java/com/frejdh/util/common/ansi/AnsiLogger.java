@@ -1,6 +1,7 @@
-package com.frejdh.util.common;
+package com.frejdh.util.common.ansi;
 
-import com.frejdh.util.common.annotation.ansi.AnsiProperties;
+import com.frejdh.util.common.ansi.annotation.AnsiProperties;
+import com.frejdh.util.common.ansi.builder.AnsiColorBuilder;
 import com.frejdh.util.common.toolbox.CommonUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,12 +78,44 @@ public class AnsiLogger {
 	}
 
 	/**
-	 * Logging for INFORMATION tags.
+	 * Logging for DEBUG tags.
 	 *
 	 * @param objects Text, colors or styles to add to the log
 	 */
 	public static void debug(Object... objects) {
-		objects = ArrayUtils.addAll(new Object[]{getTimestamp(), new AnsiElement("DEBUG ", AnsiColor.CYAN), AnsiColor.DEFAULT}, objects);
+		debug(null, objects);
+	}
+
+	/**
+	 * Logging for DEBUG tags.
+	 *
+	 * @param objects Text, colors or styles to add to the log
+	 * @param exceptionStacktrace Optional stacktrace
+	 */
+	public static void debug(Exception exceptionStacktrace, Object... objects) {
+		objects = ArrayUtils.addAll(new Object[]{getTimestamp(), new AnsiElement("DEBUG ", AnsiColor.CYAN), AnsiColor.DEFAULT}, objects,
+				exceptionStacktrace != null ? new Object[]{AnsiColor.RED, CommonUtils.exceptionStacktraceToString(exceptionStacktrace)} : "");
+		AnsiOutput.synchronizedPrint(printStream, objects);
+	}
+
+	/**
+	 * Logging for TRACE tags.
+	 *
+	 * @param objects Text, colors or styles to add to the log
+	 */
+	public static void trace(Object... objects) {
+		trace(null, objects);
+	}
+
+	/**
+	 * Logging for TRACE tags.
+	 *
+	 * @param objects Text, colors or styles to add to the log
+	 * @param exceptionStacktrace Optional stacktrace
+	 */
+	public static void trace(Exception exceptionStacktrace, Object... objects) {
+		objects = ArrayUtils.addAll(new Object[]{getTimestamp(), new AnsiElement("TRACE ", AnsiColor.GRAY), AnsiColor.DEFAULT}, objects,
+				exceptionStacktrace != null ? new Object[]{AnsiColor.RED, CommonUtils.exceptionStacktraceToString(exceptionStacktrace)} : "");
 		AnsiOutput.synchronizedPrint(printStream, objects);
 	}
 
@@ -92,7 +125,18 @@ public class AnsiLogger {
 	 * @param objects Text, colors or styles to add to the log
 	 */
 	public static void warning(Object... objects) {
-		objects = ArrayUtils.addAll(new Object[]{getTimestamp(), new AnsiElement("WARNING ", AnsiColor.YELLOW), AnsiColor.DEFAULT}, objects);
+		warning(null, objects);
+	}
+
+	/**
+	 * Logging for WARNING tags.
+	 *
+	 * @param objects Text, colors or styles to add to the log
+	 * @param exceptionStacktrace Optional stacktrace
+	 */
+	public static void warning(Exception exceptionStacktrace, Object... objects) {
+		objects = ArrayUtils.addAll(new Object[]{getTimestamp(), new AnsiElement("WARNING ", AnsiColor.YELLOW), AnsiColor.DEFAULT}, objects,
+				exceptionStacktrace != null ? new Object[]{AnsiColor.RED, CommonUtils.exceptionStacktraceToString(exceptionStacktrace)} : "");
 		AnsiOutput.synchronizedPrint(printStream, objects);
 	}
 
@@ -102,18 +146,59 @@ public class AnsiLogger {
 	 * @param objects Text, colors or styles to add to the log
 	 */
 	public static void error(Object... objects) {
-		objects = ArrayUtils.addAll(new Object[]{getTimestamp(), new AnsiElement("ERROR ", AnsiColor.RED), AnsiColor.DEFAULT}, objects);
-		AnsiOutput.synchronizedPrint(printStream, objects);
+		error(null, objects);
 	}
 
 	/**
 	 * Logging for ERROR tags.
 	 *
 	 * @param objects Text, colors or styles to add to the log
+	 * @param exceptionStacktrace Optional stacktrace
 	 */
 	public static void error(Exception exceptionStacktrace, Object... objects) {
 		objects = ArrayUtils.addAll(new Object[]{getTimestamp(), new AnsiElement("ERROR ", AnsiColor.RED), AnsiColor.DEFAULT}, objects,
-				new Object[]{AnsiColor.RED, CommonUtils.exceptionStacktraceToString(exceptionStacktrace)});
+				exceptionStacktrace != null ? new Object[]{AnsiColor.RED, CommonUtils.exceptionStacktraceToString(exceptionStacktrace)} : "");
+		AnsiOutput.synchronizedPrint(printStream, objects);
+	}
+
+	/**
+	 * Logging for MAJOR error tags.
+	 *
+	 * @param objects Text, colors or styles to add to the log
+	 */
+	public static void major(Object... objects) {
+		major(null, objects);
+	}
+
+	/**
+	 * Logging for MAJOR error tags.
+	 *
+	 * @param objects Text, colors or styles to add to the log
+	 * @param exceptionStacktrace Optional stacktrace
+	 */
+	public static void major(Exception exceptionStacktrace, Object... objects) {
+		objects = ArrayUtils.addAll(new Object[]{getTimestamp(), new AnsiElement("MAJOR", AnsiColor.RED, new AnsiColorBuilder.Background(AnsiColor.BRIGHT_YELLOW), AnsiStyle.BOLD), AnsiColor.DEFAULT, " "}, objects,
+				exceptionStacktrace != null ? new Object[]{AnsiColor.RED, CommonUtils.exceptionStacktraceToString(exceptionStacktrace)} : "");
+		AnsiOutput.synchronizedPrint(printStream, objects);
+	}
+
+	/**
+	 * Logging for CRITICAL error tags.
+	 *
+	 * @param objects Text, colors or styles to add to the log
+	 */
+	public static void critical(Object... objects) {
+		critical(null, objects);
+	}
+
+	/**
+	 * Logging for CRITICAL error tags.
+	 *
+	 * @param objects Text, colors or styles to add to the log
+	 */
+	public static void critical(Exception exceptionStacktrace, Object... objects) {
+		objects = ArrayUtils.addAll(new Object[]{getTimestamp(), new AnsiElement("CRITICAL", AnsiColor.WHITE, new AnsiColorBuilder.Background(AnsiColor.RED), AnsiStyle.BOLD), AnsiColor.DEFAULT, " "}, objects,
+				exceptionStacktrace != null ? new Object[]{AnsiColor.RED, CommonUtils.exceptionStacktraceToString(exceptionStacktrace)} : "");
 		AnsiOutput.synchronizedPrint(printStream, objects);
 	}
 
@@ -121,7 +206,7 @@ public class AnsiLogger {
 		return properties.getTimestamp().getEnabled() ? timestampFormat.format(Calendar.getInstance().getTime()) + "  " : "";
 	}
 
-	// Modified version of the JDK11 method
+	// Modified version of the JDK11 method (works on JDKs below that too!)
 	private static OutputStream nullOutputStream() {
 		return new OutputStream() {
 			private volatile boolean closed;

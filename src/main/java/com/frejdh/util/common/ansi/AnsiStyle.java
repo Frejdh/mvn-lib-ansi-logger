@@ -1,4 +1,4 @@
-package com.frejdh.util.common;
+package com.frejdh.util.common.ansi;
 
 import java.util.Arrays;
 import java.util.NoSuchElementException;

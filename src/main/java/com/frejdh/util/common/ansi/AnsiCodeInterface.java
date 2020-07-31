@@ -1,8 +1,9 @@
-package com.frejdh.util.common;
+package com.frejdh.util.common.ansi;
 
 /**
  * Interface for returning the code for the color/style etc.
  */
-interface AnsiCodeInterface {
+public interface AnsiCodeInterface {
 	int getCode();
+
 }

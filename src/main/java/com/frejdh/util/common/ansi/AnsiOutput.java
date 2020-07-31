@@ -1,15 +1,11 @@
-package com.frejdh.util.common;
+package com.frejdh.util.common.ansi;
 
-import com.frejdh.util.common.toolbox.CommonUtils;
-import com.frejdh.util.common.toolbox.OperatingSystemUtils;
-import com.frejdh.util.common.toolbox.ReflectionUtils;
-import org.fusesource.jansi.Ansi;
-import org.fusesource.jansi.AnsiConsole;
+import com.diogonunes.jcolor.Ansi;
+import com.frejdh.util.common.ansi.builder.AnsiColorBuilder;
 import java.io.PrintStream;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.Arrays;
-import static org.fusesource.jansi.Ansi.ansi;
+import java.util.List;
 
 /**
  * Logging with ANSI color codes.
@@ -20,25 +16,10 @@ public class AnsiOutput {
 	private static final char ANSI_START_1 = 27; // 001B
 	private static final char ANSI_START_2 = '[';
 	protected static final String ANSI_START = String.valueOf(ANSI_START_1) + ANSI_START_2;
-	; // 001B
 	protected static final char ANSI_END = 'm';
 
 	static {
-		if (OperatingSystemUtils.isWindows()) {
-			AnsiConsole.systemInstall();
 
-			// If the mode 'STRIP_ANSI' is active, disable Jansi permanently
-			try {
-				Field field = ReflectionUtils.setFieldToAccessible(AnsiConsole.class, "JANSI_STDOUT_TYPE");
-				String enumValue = field.get(ReflectionUtils.getInnerClassOrEnum(AnsiConsole.class, "JansiOutputType")).toString();
-				if (enumValue.equalsIgnoreCase("STRIP_ANSI"))
-					AnsiConsole.systemUninstall();
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-			} catch (NoSuchFieldException e) {
-				e.printStackTrace();
-			}
-		}
 	}
 
 	/**
@@ -51,57 +32,77 @@ public class AnsiOutput {
 	 * @return A string with ANSI output
 	 */
 	public static String toString(Object... elements) {
-		Ansi block = ansi();
-		AnsiColor prevColor = AnsiColor.DEFAULT;
+		StringBuilder block = new StringBuilder();
+		AnsiColorInterface prevForegroundColor = AnsiColor.DEFAULT;
+		AnsiColorInterface prevBackgroundColor = new AnsiColorBuilder.Background(AnsiColor.DEFAULT);
 		AnsiStyle prevStyle = AnsiStyle.NORMAL;
 
 		for (Object el : elements) {
-			if (el instanceof AnsiCodeInterface) {// Style or color
-				block.a(toAnsi((AnsiCodeInterface) el));
+			if (el.getClass().isArray() || el instanceof List<?>) { // Array or list
+				List<?> internalList = null;
+				if (el.getClass().isArray()) {
+					//noinspection ConstantConditions
+					internalList = Arrays.asList((Object[]) el);
+				}
+				else {
+					internalList = new ArrayList<>((List<?>) el);
+				}
+
+				for (Object el2 : internalList) {
+					block.append(toString(prevForegroundColor, prevStyle, el2));
+				}
+			}
+			else if (el instanceof AnsiCodeInterface) {// Style or color
+				block.append(toAnsi((AnsiCodeInterface) el));
 
 				// Save the color/style
 				if (isAnsiColor((AnsiCodeInterface) el))
-					prevColor = (AnsiColor) el;
+					prevForegroundColor = (AnsiColorInterface) el;
 				else if (isAnsiStyle((AnsiCodeInterface) el))
 					prevStyle = (AnsiStyle) el;
 			}
 			else if (el instanceof org.springframework.boot.ansi.AnsiElement) { // Spring's ANSI element class. One color or style.
 				org.springframework.boot.ansi.AnsiElement recasted = (org.springframework.boot.ansi.AnsiElement) el;
-				block.a(toAnsi(recasted));
+				block.append(toAnsi(recasted));
 
 				// Save the color/style
 				AnsiColor foundColor = AnsiColor.colorCodeToEnum(recasted.toString());
 				AnsiStyle foundStyle = AnsiStyle.styleCodeToEnum(recasted.toString());
 				if (isAnsiColor(foundColor))
-					prevColor = foundColor;
+					prevForegroundColor = foundColor;
 				if (isAnsiStyle(foundStyle))
 					prevStyle = foundStyle;
 			}
 			else if (el instanceof AnsiElement) { // My ANSI element class. Text with optional color and style
-				// TODO: RESTORE TO PREVIOUS COLOR!!!!!!
-				boolean hasColor = ((AnsiElement) el).hasColor();
+				boolean hasForegroundColor = ((AnsiElement) el).hasForegroundColor();
+				boolean hasBackgroundColor = ((AnsiElement) el).hasBackgroundColor();
 				boolean hasStyle = ((AnsiElement) el).hasStyle();
 
-				if (hasColor) {
-					block.a(toAnsi((AnsiCodeInterface) ((AnsiElement) el).getColor()));
+				if (hasForegroundColor) {
+					block.append(toAnsi((AnsiColorInterface) ((AnsiElement) el).getForegroundColor()));
+				}
+				if (hasBackgroundColor) {
+					block.append(toAnsi((AnsiColorInterface) ((AnsiElement) el).getBackgroundColor()));
 				}
 				if (hasStyle) {
-					block.a(toAnsi((AnsiCodeInterface) ((AnsiElement) el).getStyle()));
+					block.append(toAnsi((AnsiCodeInterface) ((AnsiElement) el).getStyle()));
 				}
-				block.a(((AnsiElement) el).getText());
+				block.append(((AnsiElement) el).getText());
 
 				// Text added, return to the previous state
-				if (hasColor)
-					block.a(toAnsi(prevColor));
+				if (hasForegroundColor)
+					block.append(toAnsi(prevForegroundColor));
+				if (hasBackgroundColor)
+					block.append(toAnsi(prevBackgroundColor));
 				if (hasStyle)
-					block.a(toAnsi(prevStyle));
+					block.append(toAnsi(prevStyle));
 			}
 			else { // Normal object, use toString()
-				block.a(el);
+				block.append(el);
 			}
 		}
 
-		return block.reset().toString();
+		return Ansi.colorize(block.toString());
 	}
 
 	/**
@@ -163,21 +164,34 @@ public class AnsiOutput {
 	 * Utilizes Jansi's eraseScreen() method
 	 */
 	public static void clearScreen() {
-		ansi().eraseScreen();
+		//ansi().eraseScreen();
 	}
 
 	private static boolean isAnsiColor(AnsiCodeInterface ansiCodeInstance) {
-		return (ansiCodeInstance instanceof AnsiColor);
+		return (ansiCodeInstance instanceof AnsiColorInterface);
 	}
 
 	private static boolean isAnsiStyle(AnsiCodeInterface ansiCodeInstance) {
 		return (ansiCodeInstance instanceof AnsiStyle);
 	}
 
+	/**
+	 * Implements this module's custom interface
+	 */
 	private static String toAnsi(AnsiCodeInterface ansiCodeInstance) {
+		// Color instance and 8 bit depth
+		if (ansiCodeInstance instanceof AnsiColorInterface && ((AnsiColorInterface) ansiCodeInstance).getBitDepth() == 8) {
+			return ANSI_START
+					+ (((AnsiColorInterface) ansiCodeInstance).isForeground() ? 38 : 48 + ";5;")
+					+ ansiCodeInstance.getCode()
+					+ ANSI_END;
+		}
 		return ANSI_START + ansiCodeInstance.getCode() + ANSI_END;
 	}
 
+	/**
+	 * Implements Spring boot's interface
+	 */
 	private static String toAnsi(org.springframework.boot.ansi.AnsiElement ansiElement) {
 		return ANSI_START + ansiElement.toString() + ANSI_END;
 	}
