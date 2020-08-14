@@ -8,22 +8,22 @@ public class AnsiElement {
 	private String text;
 	private List<AnsiCodeInterface> colorsAndStyles;
 
-	public AnsiElement(@Nullable String text, AnsiCodeInterface... colorsAndStyles) {
-		this.text = text != null ? text : "";
+	public AnsiElement(@Nullable Object element, AnsiCodeInterface... colorsAndStyles) {
+		this.text = element != null ? element.toString() : "";
 		this.colorsAndStyles = Arrays.asList(colorsAndStyles);
 	}
 
-	public AnsiElement(String text, AnsiColor color) {
-		this(text, color, null);
+	public AnsiElement(Object element, AnsiColor color) {
+		this(element, color, null);
 	}
 
 
-	public AnsiElement(String text, AnsiStyle style) {
-		this(text, null, style);
+	public AnsiElement(Object element, AnsiStyle style) {
+		this(element, null, style);
 	}
 
-	public AnsiElement(@Nullable String text) {
-		this(text, null, null);
+	public AnsiElement(@Nullable Object element) {
+		this(element, null, null);
 	}
 
 	public String getText() {

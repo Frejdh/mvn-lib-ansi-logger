@@ -5,8 +5,8 @@ import org.springframework.stereotype.Service;
 
 @lombok.Data
 @Service
-public class AnsiPropertyConfigurer {
+public class LoggingPropertyConfigurer {
 
 	@Autowired
-	private AnsiProperties ansiProperties;
+	private LoggingProperties loggingProperties;
 }

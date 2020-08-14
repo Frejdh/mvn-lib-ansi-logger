@@ -6,9 +6,15 @@ Doesn't work with windows at this moment.
 All of the available classes can be found [here](https://github.com/frejdh/mvn-lib-ansi-logger/tree/master/src/main/java/com/frejdh/util/common).
 
 ## Configurations
-In order to turn on/off timestamps, please add the following to your `application.properties` file:
+By default, an attempt to load `application.properties` and `config.json` from the resource directory is made. <br>
+Additional files to load can be set with the environment variable or configuration property: `ansi-logger.property-files=[File1, File2, ...]`
+
+### Available properties
+Defined with their default values
 ```
-ansi.logging.timestamp.enabled=[true|false]
+ansi-logger.enabled=true # Enable logging or not
+ansi-logger.timestamp.enabled=false # If timestamps should be enabled
+
 ```
 
 ## Adding the dependency

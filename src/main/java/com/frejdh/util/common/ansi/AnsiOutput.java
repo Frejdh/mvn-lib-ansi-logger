@@ -39,18 +39,14 @@ public class AnsiOutput {
 
 		for (Object el : elements) {
 			if (el.getClass().isArray() || el instanceof List<?>) { // Array or list
-				List<?> internalList = null;
-				if (el.getClass().isArray()) {
-					//noinspection ConstantConditions
-					internalList = Arrays.asList((Object[]) el);
+				Object[] internalList = null;
+				if (el instanceof List<?>) {
+					internalList = ((List<?>) el).toArray();
 				}
 				else {
-					internalList = new ArrayList<>((List<?>) el);
+					internalList = (Object[]) el;
 				}
-
-				for (Object el2 : internalList) {
-					block.append(toString(prevForegroundColor, prevStyle, el2));
-				}
+				block.append(toString(internalList));
 			}
 			else if (el instanceof AnsiCodeInterface) {// Style or color
 				block.append(toAnsi((AnsiCodeInterface) el));
@@ -115,13 +111,7 @@ public class AnsiOutput {
 	 * @return A string with ANSI output
 	 */
 	public static void synchronizedPrint(Object... elements) {
-		String sout = elements.length == 1 && elements[0] instanceof String
-				? elements[0].toString() : toString(elements);
-
-		synchronized (System.out) {
-			System.out.flush();
-			System.out.println(sout);
-		}
+		synchronizedPrint(System.out, elements);
 	}
 
 	/**

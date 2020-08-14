@@ -10,7 +10,9 @@ Changelog
 * 8 bit depth support for ansi colors. All terminals don't support this.
 * Refactoring
 * Small tests were added
-* Support for array and list objects
+* Support for `array` types and `List` objects
+* Fixed the annotation processor
+* Can now disable logging, select logging levels, and disable the colored output.
 
 # 1.0.0
 First version
