@@ -94,7 +94,7 @@ public class AnsiLogger {
 	 */
 	public static void debug(Exception exceptionStacktrace, Object... objects) {
 		objects = ArrayUtils.addAll(new Object[]{getTimestamp(), new AnsiElement("DEBUG ", AnsiColor.CYAN), AnsiColor.DEFAULT}, objects,
-				exceptionStacktrace != null ? new Object[]{AnsiColor.RED, CommonUtils.exceptionStacktraceToString(exceptionStacktrace)} : "");
+				exceptionStacktrace != null ? new Object[]{AnsiColor.RED, CommonUtils.stacktraceToString(exceptionStacktrace)} : "");
 		AnsiOutput.synchronizedPrint(printStream, objects);
 	}
 
@@ -115,7 +115,7 @@ public class AnsiLogger {
 	 */
 	public static void trace(Exception exceptionStacktrace, Object... objects) {
 		objects = ArrayUtils.addAll(new Object[]{getTimestamp(), new AnsiElement("TRACE ", AnsiColor.GRAY), AnsiColor.DEFAULT}, objects,
-				exceptionStacktrace != null ? new Object[]{AnsiColor.RED, CommonUtils.exceptionStacktraceToString(exceptionStacktrace)} : "");
+				exceptionStacktrace != null ? new Object[]{AnsiColor.RED, CommonUtils.stacktraceToString(exceptionStacktrace)} : "");
 		AnsiOutput.synchronizedPrint(printStream, objects);
 	}
 
@@ -136,7 +136,7 @@ public class AnsiLogger {
 	 */
 	public static void warning(Exception exceptionStacktrace, Object... objects) {
 		objects = ArrayUtils.addAll(new Object[]{getTimestamp(), new AnsiElement("WARNING ", AnsiColor.YELLOW), AnsiColor.DEFAULT}, objects,
-				exceptionStacktrace != null ? new Object[]{AnsiColor.RED, CommonUtils.exceptionStacktraceToString(exceptionStacktrace)} : "");
+				exceptionStacktrace != null ? new Object[]{AnsiColor.RED, CommonUtils.stacktraceToString(exceptionStacktrace)} : "");
 		AnsiOutput.synchronizedPrint(printStream, objects);
 	}
 
@@ -157,7 +157,7 @@ public class AnsiLogger {
 	 */
 	public static void error(Exception exceptionStacktrace, Object... objects) {
 		objects = ArrayUtils.addAll(new Object[]{getTimestamp(), new AnsiElement("ERROR ", AnsiColor.RED), AnsiColor.DEFAULT}, objects,
-				exceptionStacktrace != null ? new Object[]{AnsiColor.RED, CommonUtils.exceptionStacktraceToString(exceptionStacktrace)} : "");
+				exceptionStacktrace != null ? new Object[]{AnsiColor.RED, CommonUtils.stacktraceToString(exceptionStacktrace)} : "");
 		AnsiOutput.synchronizedPrint(printStream, objects);
 	}
 
@@ -178,7 +178,7 @@ public class AnsiLogger {
 	 */
 	public static void major(Exception exceptionStacktrace, Object... objects) {
 		objects = ArrayUtils.addAll(new Object[]{getTimestamp(), new AnsiElement("MAJOR", AnsiColor.RED, new AnsiColorBuilder.Background(AnsiColor.BRIGHT_YELLOW), AnsiStyle.BOLD), AnsiColor.DEFAULT, " "}, objects,
-				exceptionStacktrace != null ? new Object[]{AnsiColor.RED, CommonUtils.exceptionStacktraceToString(exceptionStacktrace)} : "");
+				exceptionStacktrace != null ? new Object[]{AnsiColor.RED, CommonUtils.stacktraceToString(exceptionStacktrace)} : "");
 		AnsiOutput.synchronizedPrint(printStream, objects);
 	}
 
@@ -198,7 +198,7 @@ public class AnsiLogger {
 	 */
 	public static void critical(Exception exceptionStacktrace, Object... objects) {
 		objects = ArrayUtils.addAll(new Object[]{getTimestamp(), new AnsiElement("CRITICAL", AnsiColor.WHITE, new AnsiColorBuilder.Background(AnsiColor.RED), AnsiStyle.BOLD), AnsiColor.DEFAULT, " "}, objects,
-				exceptionStacktrace != null ? new Object[]{AnsiColor.RED, CommonUtils.exceptionStacktraceToString(exceptionStacktrace)} : "");
+				exceptionStacktrace != null ? new Object[]{AnsiColor.RED, CommonUtils.stacktraceToString(exceptionStacktrace)} : "");
 		AnsiOutput.synchronizedPrint(printStream, objects);
 	}
 
