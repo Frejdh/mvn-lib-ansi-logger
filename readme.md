@@ -17,14 +17,14 @@ ansi.logging.timestamp.enabled=[true|false]
     <dependency>
         <groupId>com.frejdh.util.common</groupId>
         <artifactId>ansi-logger</artifactId>
-        <version>1.0.0</version>
+        <version>1.0.1</version>
     </dependency>
 </dependencies>
 
 <repositories> <!-- Required in order to resolve this package -->
     <repository>
         <id>mvn-lib-common-ansi-logger</id>
-        <url>https://raw.github.com/Frejdh/mvn-lib-ansi-logger/mvn-repo/</url>
+        <url>https://raw.github.com/Frejdh/mvn-lib-ansi-logger/releases/</url>
     </repository>
 </repositories>
 ```
