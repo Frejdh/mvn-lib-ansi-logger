@@ -2,9 +2,14 @@ package com.frejdh.util.common.ansi;
 
 import com.frejdh.util.common.ansi.annotation.AnsiProperties;
 import com.frejdh.util.common.ansi.builder.AnsiColorBuilder;
+import com.frejdh.util.common.ansi.models.AnsiColor;
+import com.frejdh.util.common.ansi.models.AnsiElement;
+import com.frejdh.util.common.ansi.models.AnsiStyle;
+import com.frejdh.util.common.ansi.models.LogLevel;
 import com.frejdh.util.common.toolbox.CommonUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
@@ -20,6 +25,11 @@ import java.util.*;
 @SuppressWarnings("unused")
 @Service
 public class AnsiLogger {
+
+	@FunctionalInterface
+	private interface AnsiLoggingProcedure {
+		void log();
+	}
 
 	// Output stream
 	private static PrintStream printStream;
@@ -68,13 +78,23 @@ public class AnsiLogger {
 	}
 
 	/**
+	 * Use {@link #info(Object...)} instead. Method will be removed in a future version.
+	 * @param objects Text, colors or styles to add to the log
+	 */
+	@Deprecated
+	public static void information(Object... objects) {
+		info(objects);
+	}
+
+	/**
 	 * Logging for INFORMATION tags.
 	 *
 	 * @param objects Text, colors or styles to add to the log
 	 */
-	public static void information(Object... objects) {
-		objects = ArrayUtils.addAll(new Object[]{getTimestamp(), new AnsiElement("INFORMATION ", AnsiColor.GREEN), AnsiColor.DEFAULT}, objects);
-		AnsiOutput.synchronizedPrint(printStream, objects);
+	public static void info(Object... objects) {
+		final Object[] logObjects = ArrayUtils.addAll(new Object[]{getTimestamp(), new AnsiElement(LogLevel.INFO.getText(), AnsiColor.GREEN), AnsiColor.DEFAULT, " "}, objects);
+
+		executeLoggingProcedure(LogLevel.INFO, () -> AnsiOutput.synchronizedPrint(printStream, logObjects));
 	}
 
 	/**
@@ -92,10 +112,10 @@ public class AnsiLogger {
 	 * @param objects Text, colors or styles to add to the log
 	 * @param exceptionStacktrace Optional stacktrace
 	 */
-	public static void debug(Exception exceptionStacktrace, Object... objects) {
-		objects = ArrayUtils.addAll(new Object[]{getTimestamp(), new AnsiElement("DEBUG ", AnsiColor.CYAN), AnsiColor.DEFAULT}, objects,
+	public static void debug(Throwable exceptionStacktrace, Object... objects) {
+		final Object[] logObjects = ArrayUtils.addAll(new Object[]{getTimestamp(), new AnsiElement(LogLevel.DEBUG.getText(), AnsiColor.CYAN), AnsiColor.DEFAULT, " "}, objects,
 				exceptionStacktrace != null ? new Object[]{AnsiColor.RED, CommonUtils.stacktraceToString(exceptionStacktrace)} : "");
-		AnsiOutput.synchronizedPrint(printStream, objects);
+		executeLoggingProcedure(LogLevel.DEBUG, () -> AnsiOutput.synchronizedPrint(printStream, logObjects));
 	}
 
 	/**
@@ -113,10 +133,28 @@ public class AnsiLogger {
 	 * @param objects Text, colors or styles to add to the log
 	 * @param exceptionStacktrace Optional stacktrace
 	 */
-	public static void trace(Exception exceptionStacktrace, Object... objects) {
-		objects = ArrayUtils.addAll(new Object[]{getTimestamp(), new AnsiElement("TRACE ", AnsiColor.GRAY), AnsiColor.DEFAULT}, objects,
+	public static void trace(Throwable exceptionStacktrace, Object... objects) {
+		final Object[] logObjects = ArrayUtils.addAll(new Object[]{getTimestamp(), new AnsiElement(LogLevel.TRACE.getText(), AnsiColor.GRAY), AnsiColor.DEFAULT, " "}, objects,
 				exceptionStacktrace != null ? new Object[]{AnsiColor.RED, CommonUtils.stacktraceToString(exceptionStacktrace)} : "");
-		AnsiOutput.synchronizedPrint(printStream, objects);
+		executeLoggingProcedure(LogLevel.TRACE, () -> AnsiOutput.synchronizedPrint(printStream, logObjects));
+	}
+
+	/**
+	 * Use {@link #warn(Object...)} instead. Method will be removed in a future version.
+	 */
+	@Deprecated
+	public static void warning(Object... objects) {
+		warning(null, objects);
+	}
+
+	/**
+	 * Use {@link #warn(Throwable, Object...)} instead. Method will be removed in a future version.
+	 * @param objects Text, colors or styles to add to the log
+	 * @param exceptionStacktrace Optional stacktrace
+	 */
+	@Deprecated
+	public static void warning(Throwable exceptionStacktrace, Object... objects) {
+		warn(exceptionStacktrace, objects);
 	}
 
 	/**
@@ -124,7 +162,7 @@ public class AnsiLogger {
 	 *
 	 * @param objects Text, colors or styles to add to the log
 	 */
-	public static void warning(Object... objects) {
+	public static void warn(Object... objects) {
 		warning(null, objects);
 	}
 
@@ -134,10 +172,10 @@ public class AnsiLogger {
 	 * @param objects Text, colors or styles to add to the log
 	 * @param exceptionStacktrace Optional stacktrace
 	 */
-	public static void warning(Exception exceptionStacktrace, Object... objects) {
-		objects = ArrayUtils.addAll(new Object[]{getTimestamp(), new AnsiElement("WARNING ", AnsiColor.YELLOW), AnsiColor.DEFAULT}, objects,
+	public static void warn(Throwable exceptionStacktrace, Object... objects) {
+		final Object[] logObjects = ArrayUtils.addAll(new Object[]{getTimestamp(), new AnsiElement(LogLevel.WARN.getText(), AnsiColor.YELLOW), AnsiColor.DEFAULT, " "}, objects,
 				exceptionStacktrace != null ? new Object[]{AnsiColor.RED, CommonUtils.stacktraceToString(exceptionStacktrace)} : "");
-		AnsiOutput.synchronizedPrint(printStream, objects);
+		executeLoggingProcedure(LogLevel.WARN, () -> AnsiOutput.synchronizedPrint(printStream, logObjects));
 	}
 
 	/**
@@ -155,10 +193,10 @@ public class AnsiLogger {
 	 * @param objects Text, colors or styles to add to the log
 	 * @param exceptionStacktrace Optional stacktrace
 	 */
-	public static void error(Exception exceptionStacktrace, Object... objects) {
-		objects = ArrayUtils.addAll(new Object[]{getTimestamp(), new AnsiElement("ERROR ", AnsiColor.RED), AnsiColor.DEFAULT}, objects,
+	public static void error(Throwable exceptionStacktrace, Object... objects) {
+		final Object[] logObjects = ArrayUtils.addAll(new Object[]{getTimestamp(), new AnsiElement(LogLevel.ERROR.getText(), AnsiColor.RED), AnsiColor.DEFAULT, " "}, objects,
 				exceptionStacktrace != null ? new Object[]{AnsiColor.RED, CommonUtils.stacktraceToString(exceptionStacktrace)} : "");
-		AnsiOutput.synchronizedPrint(printStream, objects);
+		executeLoggingProcedure(LogLevel.ERROR, () -> AnsiOutput.synchronizedPrint(printStream, logObjects));
 	}
 
 	/**
@@ -176,10 +214,10 @@ public class AnsiLogger {
 	 * @param objects Text, colors or styles to add to the log
 	 * @param exceptionStacktrace Optional stacktrace
 	 */
-	public static void major(Exception exceptionStacktrace, Object... objects) {
-		objects = ArrayUtils.addAll(new Object[]{getTimestamp(), new AnsiElement("MAJOR", AnsiColor.RED, new AnsiColorBuilder.Background(AnsiColor.BRIGHT_YELLOW), AnsiStyle.BOLD), AnsiColor.DEFAULT, " "}, objects,
+	public static void major(Throwable exceptionStacktrace, Object... objects) {
+		final Object[] logObjects = ArrayUtils.addAll(new Object[]{getTimestamp(), new AnsiElement(LogLevel.MAJOR.getText(), AnsiColor.RED, new AnsiColorBuilder.Background(AnsiColor.BRIGHT_YELLOW), AnsiStyle.BOLD), AnsiColor.DEFAULT, " "}, objects,
 				exceptionStacktrace != null ? new Object[]{AnsiColor.RED, CommonUtils.stacktraceToString(exceptionStacktrace)} : "");
-		AnsiOutput.synchronizedPrint(printStream, objects);
+		executeLoggingProcedure(LogLevel.MAJOR, () -> AnsiOutput.synchronizedPrint(printStream, logObjects));
 	}
 
 	/**
@@ -196,10 +234,32 @@ public class AnsiLogger {
 	 *
 	 * @param objects Text, colors or styles to add to the log
 	 */
-	public static void critical(Exception exceptionStacktrace, Object... objects) {
-		objects = ArrayUtils.addAll(new Object[]{getTimestamp(), new AnsiElement("CRITICAL", AnsiColor.WHITE, new AnsiColorBuilder.Background(AnsiColor.RED), AnsiStyle.BOLD), AnsiColor.DEFAULT, " "}, objects,
+	public static void critical(Throwable exceptionStacktrace, Object... objects) {
+		final Object[] logObjects = ArrayUtils.addAll(new Object[]{getTimestamp(), new AnsiElement(LogLevel.CRITICAL.getText(), AnsiColor.WHITE, new AnsiColorBuilder.Background(AnsiColor.RED), AnsiStyle.BOLD), AnsiColor.DEFAULT, " "}, objects,
 				exceptionStacktrace != null ? new Object[]{AnsiColor.RED, CommonUtils.stacktraceToString(exceptionStacktrace)} : "");
-		AnsiOutput.synchronizedPrint(printStream, objects);
+		executeLoggingProcedure(LogLevel.CRITICAL, () -> AnsiOutput.synchronizedPrint(printStream, logObjects));
+	}
+
+	private static boolean shouldLog(LogLevel logLevel) {
+		String currentPath = Arrays.stream(new Throwable().getStackTrace())
+				.map(StackTraceElement::getClassName)
+				.filter(classpath -> !classpath.equals(AnsiLogger.class.getCanonicalName()))
+				.findFirst().orElse(null);
+
+		while (currentPath != null) {
+			LogLevel definedLoggingLevel = properties.getPaths().get(currentPath);
+			if (definedLoggingLevel != null) {
+				return LogLevel.isHigherOrEqualLevel(definedLoggingLevel, logLevel);
+			}
+			currentPath = currentPath.contains(".") ? currentPath.substring(0, currentPath.lastIndexOf(".")) : null;
+		}
+		return LogLevel.isHigherOrEqualLevel(properties.getDefaultLevel(), logLevel);
+	}
+
+	private static void executeLoggingProcedure(LogLevel logLevel, AnsiLoggingProcedure loggingProcedure) {
+		if (shouldLog(logLevel)) {
+			loggingProcedure.log();
+		}
 	}
 
 	private static String getTimestamp() {
@@ -222,9 +282,8 @@ public class AnsiLogger {
 				ensureOpen();
 			}
 
-			@SuppressWarnings({"CStyleArrayDeclaration", "NullableProblems"})
 			@Override
-			public void write(byte b[], int off, int len) throws IOException {
+			public void write(byte[] b, int off, int len) throws IOException {
 				if ((b.length | off | b.length) < 0 || b.length > b.length - off)
 					throw new IOException();
 				ensureOpen();
@@ -236,4 +295,5 @@ public class AnsiLogger {
 			}
 		};
 	}
+
 }

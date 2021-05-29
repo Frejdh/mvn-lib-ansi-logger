@@ -17,7 +17,7 @@ ansi.logging.timestamp.enabled=[true|false]
     <dependency>
         <groupId>com.frejdh.util.common</groupId>
         <artifactId>ansi-logger</artifactId>
-        <version>1.0.1</version>
+        <version>1.1.0</version>
     </dependency>
 </dependencies>
 

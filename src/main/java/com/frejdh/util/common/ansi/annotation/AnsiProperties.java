@@ -1,9 +1,11 @@
 package com.frejdh.util.common.ansi.annotation;
 
-import lombok.Data;
-import lombok.ToString;
+import com.frejdh.util.common.ansi.models.LogLevel;
+import com.frejdh.util.environment.Config;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Configuration properties for the Ansi dependency.
@@ -15,17 +17,17 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "ansi.logging")
 public class AnsiProperties {
 
-	//
-	// Normal properties and nested properties
-	//
+	public AnsiProperties() {
+		this.timestamp = new Timestamp();
+		this.timestamp.enabled = Config.getBoolean("ansi.logging.timestamp.enabled", timestamp.enabled);
+		this.timestamp.format = Config.getString("ansi.logging.timestamp.format", timestamp.format);
+	}
+
 	private Timestamp timestamp;
 
-	public Timestamp getTimestamp() {
-		if (timestamp == null) { // If not using spring-boot...
-			timestamp = new Timestamp();
-		}
-		return timestamp;
-	}
+	private Map<String, LogLevel> paths = new HashMap<>();
+
+	private LogLevel defaultLevel = LogLevel.INFO;
 
 	//
 	// Nested property classes
@@ -43,4 +45,5 @@ public class AnsiProperties {
 		 */
 		private String format = "yyyy-MM-dd HH:mm:ss.SSS";
 	}
+
 }

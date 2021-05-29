@@ -1,4 +1,4 @@
-package com.frejdh.util.common.ansi;
+package com.frejdh.util.common.ansi.models;
 
 import org.springframework.lang.Nullable;
 import java.util.Arrays;

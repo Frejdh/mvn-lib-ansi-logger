@@ -1,7 +1,7 @@
 package com.frejdh.util.common.ansi.builder;
 
-import com.frejdh.util.common.ansi.AnsiColor;
-import com.frejdh.util.common.ansi.AnsiColorInterface;
+import com.frejdh.util.common.ansi.models.AnsiColor;
+import com.frejdh.util.common.ansi.models.AnsiColorInterface;
 import com.frejdh.util.common.ansi.AnsiLogger;
 import javax.validation.constraints.NotNull;
 

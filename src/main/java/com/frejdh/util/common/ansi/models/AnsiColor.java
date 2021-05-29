@@ -1,5 +1,6 @@
-package com.frejdh.util.common.ansi;
+package com.frejdh.util.common.ansi.models;
 
+import com.frejdh.util.common.ansi.AnsiOutput;
 import com.frejdh.util.common.ansi.builder.BitDepth;
 import java.util.Arrays;
 import java.util.NoSuchElementException;

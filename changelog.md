@@ -1,7 +1,11 @@
 Changelog
 -
 
-# 1.0.1-SNAPSHOT
+# 1.1.0
+* Environmental variables for setting packages/classes to log. Default global is `WARN`.
+* The class `Throwable` is now used instead of `Exception` when logging stacktraces.
+
+# 1.0.1
 * Migrated from [https://github.com/fusesource/jansi](Jansi) to [https://github.com/dialex/JColor](JColor)
 * Added the class `AnsiColorBuilder` that allows building custom Ansi color objects
 * New exception `ColorCodeOutOfRange` for validating the range of said color object

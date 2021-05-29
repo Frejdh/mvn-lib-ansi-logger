@@ -2,6 +2,11 @@ package com.frejdh.util.common.ansi;
 
 import com.diogonunes.jcolor.Ansi;
 import com.frejdh.util.common.ansi.builder.AnsiColorBuilder;
+import com.frejdh.util.common.ansi.models.AnsiCodeInterface;
+import com.frejdh.util.common.ansi.models.AnsiColor;
+import com.frejdh.util.common.ansi.models.AnsiColorInterface;
+import com.frejdh.util.common.ansi.models.AnsiElement;
+import com.frejdh.util.common.ansi.models.AnsiStyle;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
