@@ -9,10 +9,8 @@ import com.frejdh.util.common.ansi.models.LogLevel;
 import com.frejdh.util.common.toolbox.CommonUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -38,13 +36,6 @@ public class AnsiLogger {
 	@Autowired private AnsiProperties autowiredProperties;
 	private static AnsiProperties properties;
 	private static SimpleDateFormat timestampFormat;
-
-	// Init
-	@PostConstruct
-	public void initProperties() { // If spring-boot is used, load the defined properties
-		properties = autowiredProperties;
-		timestampFormat = new SimpleDateFormat(properties.getTimestamp().getFormat());
-	}
 
 	static {
 		properties = new AnsiProperties();
