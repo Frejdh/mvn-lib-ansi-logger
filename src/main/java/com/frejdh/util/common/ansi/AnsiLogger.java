@@ -16,6 +16,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * Utilizes {@link AnsiOutput} methods for different logging actions. All methods are synchronized.
@@ -83,7 +84,7 @@ public class AnsiLogger {
 	 * @param objects Text, colors or styles to add to the log
 	 */
 	public static void info(Object... objects) {
-		final Object[] logObjects = ArrayUtils.addAll(new Object[]{getTimestamp(), new AnsiElement(LogLevel.INFO.getText(), AnsiColor.GREEN), AnsiColor.DEFAULT, " "}, objects);
+		final Object[] logObjects = merge(new Object[]{getTimestamp(), new AnsiElement(LogLevel.INFO.getText(), AnsiColor.GREEN), AnsiColor.DEFAULT, " "}, objects);
 
 		executeLoggingProcedure(LogLevel.INFO, () -> AnsiOutput.synchronizedPrint(printStream, logObjects));
 	}
@@ -104,7 +105,7 @@ public class AnsiLogger {
 	 * @param exceptionStacktrace Optional stacktrace
 	 */
 	public static void debug(Throwable exceptionStacktrace, Object... objects) {
-		final Object[] logObjects = ArrayUtils.addAll(new Object[]{getTimestamp(), new AnsiElement(LogLevel.DEBUG.getText(), AnsiColor.CYAN), AnsiColor.DEFAULT, " "}, objects,
+		final Object[] logObjects = merge(new Object[]{getTimestamp(), new AnsiElement(LogLevel.DEBUG.getText(), AnsiColor.CYAN), AnsiColor.DEFAULT, " "}, objects,
 				exceptionStacktrace != null ? new Object[]{AnsiColor.RED, CommonUtils.stacktraceToString(exceptionStacktrace)} : "");
 		executeLoggingProcedure(LogLevel.DEBUG, () -> AnsiOutput.synchronizedPrint(printStream, logObjects));
 	}
@@ -125,7 +126,7 @@ public class AnsiLogger {
 	 * @param exceptionStacktrace Optional stacktrace
 	 */
 	public static void trace(Throwable exceptionStacktrace, Object... objects) {
-		final Object[] logObjects = ArrayUtils.addAll(new Object[]{getTimestamp(), new AnsiElement(LogLevel.TRACE.getText(), AnsiColor.GRAY), AnsiColor.DEFAULT, " "}, objects,
+		final Object[] logObjects = merge(new Object[]{getTimestamp(), new AnsiElement(LogLevel.TRACE.getText(), AnsiColor.GRAY), AnsiColor.DEFAULT, " "}, objects,
 				exceptionStacktrace != null ? new Object[]{AnsiColor.RED, CommonUtils.stacktraceToString(exceptionStacktrace)} : "");
 		executeLoggingProcedure(LogLevel.TRACE, () -> AnsiOutput.synchronizedPrint(printStream, logObjects));
 	}
@@ -164,7 +165,7 @@ public class AnsiLogger {
 	 * @param exceptionStacktrace Optional stacktrace
 	 */
 	public static void warn(Throwable exceptionStacktrace, Object... objects) {
-		final Object[] logObjects = ArrayUtils.addAll(new Object[]{getTimestamp(), new AnsiElement(LogLevel.WARN.getText(), AnsiColor.YELLOW), AnsiColor.DEFAULT, " "}, objects,
+		final Object[] logObjects = merge(new Object[]{getTimestamp(), new AnsiElement(LogLevel.WARN.getText(), AnsiColor.YELLOW), AnsiColor.DEFAULT, " "}, objects,
 				exceptionStacktrace != null ? new Object[]{AnsiColor.RED, CommonUtils.stacktraceToString(exceptionStacktrace)} : "");
 		executeLoggingProcedure(LogLevel.WARN, () -> AnsiOutput.synchronizedPrint(printStream, logObjects));
 	}
@@ -185,7 +186,7 @@ public class AnsiLogger {
 	 * @param exceptionStacktrace Optional stacktrace
 	 */
 	public static void error(Throwable exceptionStacktrace, Object... objects) {
-		final Object[] logObjects = ArrayUtils.addAll(new Object[]{getTimestamp(), new AnsiElement(LogLevel.ERROR.getText(), AnsiColor.RED), AnsiColor.DEFAULT, " "}, objects,
+		final Object[] logObjects = merge(new Object[]{getTimestamp(), new AnsiElement(LogLevel.ERROR.getText(), AnsiColor.RED), AnsiColor.DEFAULT, " "}, objects,
 				exceptionStacktrace != null ? new Object[]{AnsiColor.RED, CommonUtils.stacktraceToString(exceptionStacktrace)} : "");
 		executeLoggingProcedure(LogLevel.ERROR, () -> AnsiOutput.synchronizedPrint(printStream, logObjects));
 	}
@@ -206,7 +207,7 @@ public class AnsiLogger {
 	 * @param exceptionStacktrace Optional stacktrace
 	 */
 	public static void major(Throwable exceptionStacktrace, Object... objects) {
-		final Object[] logObjects = ArrayUtils.addAll(new Object[]{getTimestamp(), new AnsiElement(LogLevel.MAJOR.getText(), AnsiColor.RED, new AnsiColorBuilder.Background(AnsiColor.BRIGHT_YELLOW), AnsiStyle.BOLD), AnsiColor.DEFAULT, " "}, objects,
+		final Object[] logObjects = merge(new Object[]{getTimestamp(), new AnsiElement(LogLevel.MAJOR.getText(), AnsiColor.RED, new AnsiColorBuilder.Background(AnsiColor.BRIGHT_YELLOW), AnsiStyle.BOLD), AnsiColor.DEFAULT, " "}, objects,
 				exceptionStacktrace != null ? new Object[]{AnsiColor.RED, CommonUtils.stacktraceToString(exceptionStacktrace)} : "");
 		executeLoggingProcedure(LogLevel.MAJOR, () -> AnsiOutput.synchronizedPrint(printStream, logObjects));
 	}
@@ -226,7 +227,7 @@ public class AnsiLogger {
 	 * @param objects Text, colors or styles to add to the log
 	 */
 	public static void critical(Throwable exceptionStacktrace, Object... objects) {
-		final Object[] logObjects = ArrayUtils.addAll(new Object[]{getTimestamp(), new AnsiElement(LogLevel.CRITICAL.getText(), AnsiColor.WHITE, new AnsiColorBuilder.Background(AnsiColor.RED), AnsiStyle.BOLD), AnsiColor.DEFAULT, " "}, objects,
+		final Object[] logObjects = merge(new Object[]{getTimestamp(), new AnsiElement(LogLevel.CRITICAL.getText(), AnsiColor.WHITE, new AnsiColorBuilder.Background(AnsiColor.RED), AnsiStyle.BOLD), AnsiColor.DEFAULT, " "}, objects,
 				exceptionStacktrace != null ? new Object[]{AnsiColor.RED, CommonUtils.stacktraceToString(exceptionStacktrace)} : "");
 		executeLoggingProcedure(LogLevel.CRITICAL, () -> AnsiOutput.synchronizedPrint(printStream, logObjects));
 	}
@@ -285,6 +286,19 @@ public class AnsiLogger {
 				closed = true;
 			}
 		};
+	}
+
+	private static Object[] merge(Object ...objectsOrArrays) {
+		List<Object> retval = new ArrayList<>();
+		for (Object obj : objectsOrArrays) {
+			if (obj != null && obj.getClass().isArray()) {
+				retval.addAll(Arrays.asList((Object[]) obj));
+			}
+			else {
+				retval.add(obj);
+			}
+		}
+		return retval.toArray();
 	}
 
 }

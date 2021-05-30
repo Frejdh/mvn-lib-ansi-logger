@@ -1,5 +1,6 @@
 package com.frejdh.util.common.ansi;
 
+import com.diogonunes.jcolor.Ansi;
 import com.frejdh.util.common.ansi.annotation.AnsiProperties;
 import com.frejdh.util.common.ansi.models.AnsiColor;
 import com.frejdh.util.common.ansi.models.AnsiElement;
@@ -132,8 +133,10 @@ public class SimpleTests {
 		Assert.assertTrue("Was: " + outContent.toString(), outContent.toString().contains("critical"));
 	}
 
-// @Test
+//  @Test
 	public void testPathLevels() {
+		AnsiLogger.debug(AnsiColor.BLUE, "test");
+
 		Map<String, LogLevel> paths = new HashMap();
 		Mockito.when(ansiProperties.getDefaultLevel()).thenReturn(LogLevel.TRACE);
 		paths.put("com.frejdh", LogLevel.CRITICAL);
