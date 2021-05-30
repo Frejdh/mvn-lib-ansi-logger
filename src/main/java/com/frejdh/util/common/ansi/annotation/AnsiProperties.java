@@ -18,6 +18,10 @@ import java.util.Map;
 public class AnsiProperties {
 
 	public AnsiProperties() {
+		LogLevel defaultLevelFromProperties = LogLevel.toLogLevel(Config.getString("ansi.logging.default-level"));
+		if (defaultLevelFromProperties != null) {
+			this.defaultLevel = defaultLevelFromProperties;
+		}
 		this.timestamp = new Timestamp();
 		this.timestamp.enabled = Config.getBoolean("ansi.logging.timestamp.enabled", timestamp.enabled);
 		this.timestamp.format = Config.getString("ansi.logging.timestamp.format", timestamp.format);

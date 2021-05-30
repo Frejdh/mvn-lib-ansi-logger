@@ -132,7 +132,7 @@ public class SimpleTests {
 		Assert.assertTrue("Was: " + outContent.toString(), outContent.toString().contains("critical"));
 	}
 
-//	@Test
+// @Test
 	public void testPathLevels() {
 		Map<String, LogLevel> paths = new HashMap();
 		Mockito.when(ansiProperties.getDefaultLevel()).thenReturn(LogLevel.TRACE);
