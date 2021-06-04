@@ -45,7 +45,7 @@
         <dependency> <!-- Validate properties -->
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
-            <version>6.0.18.Final</version>
+            <version>6.0.20.Final</version>
             <scope>compile</scope>
         </dependency>
 
