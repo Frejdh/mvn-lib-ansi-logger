@@ -23,9 +23,7 @@ public class AnsiOutput {
 	protected static final String ANSI_START = String.valueOf(ANSI_START_1) + ANSI_START_2;
 	protected static final char ANSI_END = 'm';
 
-	static {
-
-	}
+	private AnsiOutput() { }
 
 	/**
 	 * Create an ANSI string with the given elements.

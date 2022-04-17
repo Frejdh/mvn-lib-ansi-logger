@@ -1,6 +1,6 @@
 package com.frejdh.util.common.ansi.builder;
 
-public class ColorCodeOutOfRange extends Exception {
+public class ColorCodeOutOfRange extends RuntimeException {
 
 	public ColorCodeOutOfRange() { }
 

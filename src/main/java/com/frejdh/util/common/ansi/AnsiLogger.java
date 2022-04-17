@@ -31,11 +31,11 @@ public class AnsiLogger {
 	}
 
 	// Output stream
-	private static PrintStream printStream;
+	protected static PrintStream printStream;
 
 	// Ansi properties
 	@Autowired private AnsiProperties autowiredProperties;
-	private static AnsiProperties properties;
+	protected static AnsiProperties properties;
 	private static SimpleDateFormat timestampFormat;
 
 	static {

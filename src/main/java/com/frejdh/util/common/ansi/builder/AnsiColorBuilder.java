@@ -10,7 +10,6 @@ import javax.validation.constraints.NotNull;
  */
 public class AnsiColorBuilder implements AnsiColorInterface {
 
-	// Variables
 	protected final int colorCode;
 	protected final ColorType colorType;
 	protected final BitDepth bitDepth;
@@ -22,7 +21,7 @@ public class AnsiColorBuilder implements AnsiColorInterface {
 	 * @param colorCode Integer code of the color
 	 * @throws ColorCodeOutOfRange If invalid range of the color code
 	 */
-	protected AnsiColorBuilder(BitDepth bitDepth, int colorCode) {
+	protected AnsiColorBuilder(BitDepth bitDepth, int colorCode) throws ColorCodeOutOfRange {
 		this.bitDepth = bitDepth;
 		this.colorCode = colorCode;
 		if (bitDepth.equals(BitDepth.FOUR)) {
@@ -31,6 +30,7 @@ public class AnsiColorBuilder implements AnsiColorInterface {
 		else {
 			this.colorType = ColorType.FOREGROUND;
 		}
+		validateColorRange();
 	}
 
 	/**
@@ -40,21 +40,16 @@ public class AnsiColorBuilder implements AnsiColorInterface {
 	 * @param colorCode Integer code of the color
 	 * @throws ColorCodeOutOfRange If invalid range of the color code
 	 */
-	protected AnsiColorBuilder(ColorType colorType, BitDepth bitDepth, int colorCode) {
+	protected AnsiColorBuilder(ColorType colorType, BitDepth bitDepth, int colorCode) throws ColorCodeOutOfRange {
 		this.colorType = colorType;
 		this.bitDepth = bitDepth;
 		this.colorCode = colorCode;
+		validateColorRange();
 	}
 
 	public static class Foreground extends AnsiColorBuilder {
 		public Foreground(BitDepth bitDepth, int colorCode) {
 			super(ColorType.FOREGROUND, bitDepth, colorCode);
-
-			try {
-				validateColorRange();
-			} catch (Exception e) {
-				AnsiLogger.warning("Color code was out of range. Must be 0-255, was ", AnsiColor.BLUE, colorCode);
-			}
 		}
 
 		public Foreground(int colorCode) {
@@ -65,12 +60,6 @@ public class AnsiColorBuilder implements AnsiColorInterface {
 	public static class Background extends AnsiColorBuilder {
 		public Background(BitDepth bitDepth, int colorCode) {
 			super(ColorType.BACKGROUND, bitDepth, colorCode);
-
-			try {
-				validateColorRange();
-			} catch (Exception e) {
-				AnsiLogger.warning("Color code was out of range. Must be 0-255, was ", AnsiColor.BLUE, colorCode);
-			}
 		}
 
 		public Background(int colorCode) {

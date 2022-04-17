@@ -1,5 +1,9 @@
 Changelog
 -
+# 1.2.0
+* Fixed "paths" variable.
+* Fixed unit tests. Now uses Junit 5
+* Other dependency updates
 
 # 1.1.0
 * Environmental variables for setting packages/classes to log. Default global is `WARN`.
