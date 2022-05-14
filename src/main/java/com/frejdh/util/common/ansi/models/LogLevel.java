@@ -5,7 +5,7 @@ import java.util.Arrays;
 public enum LogLevel {
 	TRACE("TRACE", 0),
 	DEBUG("DEBUG", 1),
-	INFO("INFORMATION", 2),
+	INFO("INFO", 2),
 	WARN("WARNING", 3),
 	ERROR("ERROR", 4),
 	MAJOR("MAJOR", 5),

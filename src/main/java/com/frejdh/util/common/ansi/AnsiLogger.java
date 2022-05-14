@@ -7,7 +7,9 @@ import com.frejdh.util.common.ansi.models.AnsiElement;
 import com.frejdh.util.common.ansi.models.AnsiStyle;
 import com.frejdh.util.common.ansi.models.LogLevel;
 import com.frejdh.util.common.toolbox.CommonUtils;
+import com.frejdh.util.environment.ConversionUtils;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.logging.log4j.LogManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
@@ -31,7 +33,7 @@ public class AnsiLogger {
 	}
 
 	// Output stream
-	protected static PrintStream printStream;
+	private static PrintStream printStream;
 
 	// Ansi properties
 	@Autowired private AnsiProperties autowiredProperties;
@@ -85,7 +87,6 @@ public class AnsiLogger {
 	 */
 	public static void info(Object... objects) {
 		final Object[] logObjects = merge(new Object[]{getTimestamp(), new AnsiElement(LogLevel.INFO.getText(), AnsiColor.GREEN), AnsiColor.DEFAULT, " "}, objects);
-
 		executeLoggingProcedure(LogLevel.INFO, () -> AnsiOutput.synchronizedPrint(printStream, logObjects));
 	}
 
@@ -239,7 +240,7 @@ public class AnsiLogger {
 				.findFirst().orElse(null);
 
 		while (currentPath != null) {
-			LogLevel definedLoggingLevel = properties.getPaths().get(currentPath);
+			LogLevel definedLoggingLevel = properties.getPathLogLevel(currentPath);
 			if (definedLoggingLevel != null) {
 				return LogLevel.isHigherOrEqualLevel(definedLoggingLevel, logLevel);
 			}

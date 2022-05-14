@@ -2,6 +2,7 @@ package com.frejdh.util.common.ansi.annotation;
 
 import com.frejdh.util.common.ansi.models.LogLevel;
 import com.frejdh.util.environment.Config;
+import com.frejdh.util.environment.ConversionUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -25,22 +26,20 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @EnableConfigurationProperties
-@ConfigurationProperties(prefix = "ansi.logging")
+@ConfigurationProperties(prefix = AnsiPropertyKeys.PREFIX)
 public class AnsiProperties {
 
-	private static transient LogLevel DEFAULT_LOGGING_LEVEL = LogLevel.toLogLevel(Config.getString("ansi.logging.default-level"));
+	private static transient LogLevel DEFAULT_LOGGING_LEVEL = LogLevel.toLogLevel(Config.getString(AnsiPropertyKeys.DEFAULT_LOGGING_LEVEL));
 
 	private final Timestamp timestamp = new Timestamp();
 
-	private final Map<String, LogLevel> paths = new HashMap<>();
-
-	private final List<String> pathss = new ArrayList<>();
-
+	// Paths are stored in kebab-case, fix?
+	private final Map<String, LogLevel> paths = convertMultiMapToSimpleMap(Config.getFlattenedPathMultiMap(AnsiPropertyKeys.CLASS_LOGGING_BASE));
 
 	private LogLevel defaultLevel = (DEFAULT_LOGGING_LEVEL != null) ? DEFAULT_LOGGING_LEVEL : LogLevel.INFO;
 
-	public Map<String, LogLevel> getPaths() {
-		return paths;
+	public LogLevel getPathLogLevel(String path) {
+		return paths.get(ConversionUtils.toKebabCase(path));
 	}
 
 	//
@@ -58,6 +57,17 @@ public class AnsiProperties {
 		 * The used format for the timestamps (if enabled)
 		 */
 		private String format = Config.getString("ansi.logging.timestamp.format", "yyyy-MM-dd HH:mm:ss.SSS");
+	}
+
+	private Map<String, LogLevel> convertMultiMapToSimpleMap(Map<String, List<Object>> map) {
+		Map<String, LogLevel> simpleMap = new HashMap<>();
+		map.forEach((key, value) -> {
+			if (value != null && !value.isEmpty()) {
+				simpleMap.put(key, LogLevel.toLogLevel(value.get(0).toString()));
+			}
+		});
+
+		return simpleMap;
 	}
 
 }

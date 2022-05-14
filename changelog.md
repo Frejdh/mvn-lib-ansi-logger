@@ -1,5 +1,6 @@
 Changelog
 -
+
 # 1.2.0
 * Fixed "paths" variable.
 * Fixed unit tests. Now uses Junit 5

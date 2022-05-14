@@ -6,25 +6,24 @@ import com.frejdh.util.common.ansi.builder.BitDepth;
 import com.frejdh.util.common.ansi.builder.ColorCodeOutOfRange;
 import com.frejdh.util.common.ansi.models.AnsiColor;
 import com.frejdh.util.common.ansi.models.LogLevel;
-import com.frejdh.util.common.toolbox.ReflectionUtils;
+import com.frejdh.util.environment.Config;
+import com.frejdh.util.environment.test.helper.TestProperty;
+import com.frejdh.util.environment.test.helper.TestPropertyExtension;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
-import java.util.HashMap;
-import java.util.Map;
 
-@ExtendWith(SpringExtension.class)
+import static org.mockito.ArgumentMatchers.eq;
+
+@ExtendWith({SpringExtension.class, TestPropertyExtension.class})
 @EnableConfigurationProperties(AnsiProperties.class)
 public class LoggerTests {
 
@@ -36,17 +35,18 @@ public class LoggerTests {
 	@BeforeEach
 	public void setupCustomStreams() {
 		outContent.reset();
-		AnsiLogger.printStream = new PrintStream(outContent);
+		AnsiLogger.setPrintStream(new PrintStream(outContent));
 	}
 
 	@AfterEach
 	public void restoreStreams() {
-		AnsiLogger.printStream = originalOut;
+		AnsiLogger.setPrintStream(originalOut);
 	}
 
 	@BeforeEach
-	public void setupSpies(@Autowired AnsiProperties ansiProperties) throws Exception {
-		this.ansiProperties = Mockito.spy(ansiProperties);
+	public void setupSpies() {
+		Config.refresh(true);
+		this.ansiProperties = Mockito.spy(new AnsiProperties());
 		AnsiLogger.properties = this.ansiProperties;
 	}
 
@@ -97,23 +97,20 @@ public class LoggerTests {
 	}
 
 	@Test
+	@TestProperty(key = "ansi.logging.paths.com.frejdh.util.common.ansi.LoggerTests", value = "DEBUG")
 	public void classLoggingWorks() {
-		setupCustomStreams();
 		AnsiLogger.trace("Test1");
-		String output = outContent.toString();
-		restoreStreams();
-		Assertions.assertFalse(output.contains("Test1"), "Was: " + output);
-
-		setupCustomStreams();
 		AnsiLogger.debug("Test2");
-		restoreStreams();
+
+		String output = outContent.toString();
+		Assertions.assertFalse(output.contains("Test1"), "Was: " + output);
 		Assertions.assertTrue(output.contains("Test2"), "Was: " + output);
 	}
 
 	@Test
 	public void testDefaultLoggingLevelsForTrace() {
 		Mockito.when(ansiProperties.getDefaultLevel()).thenReturn(LogLevel.TRACE);
-		setupCustomStreams();
+
 		AnsiLogger.trace("trace");
 		AnsiLogger.debug("debug");
 
@@ -124,27 +121,25 @@ public class LoggerTests {
 	@Test
 	public void testDefaultLoggingLevelsForCritical() {
 		Mockito.when(ansiProperties.getDefaultLevel()).thenReturn(LogLevel.CRITICAL);
-		setupCustomStreams();
+
 		AnsiLogger.error("error");
 		AnsiLogger.critical("critical");
+
 		Assertions.assertFalse(outContent.toString().contains("error"), "Was: " + outContent);
 		Assertions.assertTrue(outContent.toString().contains("critical"), "Was: " + outContent);
 	}
 
 	@Test
 	public void testPathLevels() {
-		AnsiLogger.debug(AnsiColor.BLUE, "test");
-
-		Map<String, LogLevel> paths = new HashMap();
 		Mockito.when(ansiProperties.getDefaultLevel()).thenReturn(LogLevel.TRACE);
-		paths.put("com.frejdh", LogLevel.CRITICAL);
+		Mockito.when(ansiProperties.getPathLogLevel(eq("com.frejdh"))).thenReturn(LogLevel.ERROR);
 
-		Mockito.when(ansiProperties.getPaths()).thenReturn(paths);
-		setupCustomStreams();
+		AnsiLogger.info("info");
 		AnsiLogger.error("error");
 		AnsiLogger.critical("critical");
-		restoreStreams();
-		Assertions.assertFalse(outContent.toString().contains("error"), "Was: " + outContent);
+
+		Assertions.assertFalse(outContent.toString().contains("info"), "Was: " + outContent);
+		Assertions.assertTrue(outContent.toString().contains("error"), "Was: " + outContent);
 		Assertions.assertTrue(outContent.toString().contains("critical"), "Was: " + outContent);
 	}
 

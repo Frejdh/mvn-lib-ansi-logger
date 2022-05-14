@@ -7,6 +7,8 @@ import com.frejdh.util.common.ansi.models.AnsiColor;
 import com.frejdh.util.common.ansi.models.AnsiColorInterface;
 import com.frejdh.util.common.ansi.models.AnsiElement;
 import com.frejdh.util.common.ansi.models.AnsiStyle;
+import org.apache.logging.log4j.Logger;
+
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -140,6 +142,7 @@ public class AnsiOutput {
 	public static void synchronizedPrint(PrintStream printStream, Object... elements) {
 		String sout = elements.length == 1 && elements[0] instanceof String
 				? elements[0].toString() : toString(elements);
+
 
 		if (printStream != null) {
 			synchronized (printStream) {
