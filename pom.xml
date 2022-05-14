@@ -24,7 +24,7 @@
 
         <jcolor.version>5.2.0</jcolor.version>
         <frejdh.common-toolbox.version>1.2.0</frejdh.common-toolbox.version>
-        <frejdh.configurator.version>2.1.0-SNAPSHOT</frejdh.configurator.version>
+        <frejdh.configurator.version>2.1.0</frejdh.configurator.version>
     </properties>
 
     <dependencies>
