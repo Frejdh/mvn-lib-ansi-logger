@@ -37,13 +37,20 @@ public class AnsiOutput {
 	 * @return A string with ANSI output
 	 */
 	public static String toString(Object... elements) {
+		if (elements == null || elements.length == 0) {
+			return "";
+		}
+
 		StringBuilder block = new StringBuilder();
 		AnsiColorInterface prevForegroundColor = AnsiColor.DEFAULT;
 		AnsiColorInterface prevBackgroundColor = new AnsiColorBuilder.Background(AnsiColor.DEFAULT);
 		AnsiStyle prevStyle = AnsiStyle.NORMAL;
 
 		for (Object el : elements) {
-			if (el.getClass().isArray() || el instanceof List<?>) { // Array or list
+			if (el == null) {
+				block.append("null");
+			}
+			else if (el.getClass().isArray() || el instanceof List<?>) { // Array or list
 				List<?> internalList = null;
 				if (el.getClass().isArray()) {
 					//noinspection ConstantConditions
@@ -120,13 +127,7 @@ public class AnsiOutput {
 	 * @return A string with ANSI output
 	 */
 	public static void synchronizedPrint(Object... elements) {
-		String sout = elements.length == 1 && elements[0] instanceof String
-				? elements[0].toString() : toString(elements);
-
-		synchronized (System.out) {
-			System.out.flush();
-			System.out.println(sout);
-		}
+		synchronizedPrint(System.out, elements);
 	}
 
 	/**
@@ -140,14 +141,10 @@ public class AnsiOutput {
 	 */
 	@SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
 	public static void synchronizedPrint(PrintStream printStream, Object... elements) {
-		String sout = elements.length == 1 && elements[0] instanceof String
-				? elements[0].toString() : toString(elements);
-
-
 		if (printStream != null) {
 			synchronized (printStream) {
 				printStream.flush();
-				printStream.println(sout);
+				printStream.println(toString(elements));
 			}
 		}
 	}

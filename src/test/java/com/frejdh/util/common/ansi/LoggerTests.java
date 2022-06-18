@@ -143,4 +143,9 @@ public class LoggerTests {
 		Assertions.assertTrue(outContent.toString().contains("critical"), "Was: " + outContent);
 	}
 
+	@Test
+	public void doesNotThrowExceptionOnNullElements() {
+		Assertions.assertDoesNotThrow(() -> AnsiLogger.info("some ", null, " elements"));
+	}
+
 }

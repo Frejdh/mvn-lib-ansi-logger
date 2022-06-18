@@ -1,6 +1,9 @@
 Changelog
 -
 
+# 1.2.1
+* Improved null-safety for logging.
+
 # 1.2.0
 * Fixed "paths" variable.
 * Fixed unit tests. Now uses Junit 5
