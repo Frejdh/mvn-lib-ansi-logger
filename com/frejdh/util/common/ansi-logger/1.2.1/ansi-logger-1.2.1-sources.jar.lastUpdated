@@ -1,0 +1,26 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Sat Jun 18 20:27:51 CEST 2022
+https\://raw.github.com/Frejdh/mvn-lib-master/releases/.lastUpdated=1655576868777
+https\://raw.github.com/Frejdh/mvn-lib-network-toolbox/releases/.error=
+https\://repo.eclipse.org/content/groups/releases/.error=
+https\://raw.github.com/Frejdh/mvn-lib-common-toolbox/releases/.error=
+https\://raw.github.com/Frejdh/mvn-lib-file-watcher/releases/.error=
+https\://raw.github.com/Frejdh/mvn-lib-ansi-logger/releases/.error=
+https\://gitblit.github.io/gitblit-maven/.lastUpdated=1655576868231
+https\://gitblit.github.io/gitblit-maven/.error=
+https\://raw.github.com/Frejdh/mvn-lib-file-watcher/releases/.lastUpdated=1655576870732
+https\://raw.github.com/Frejdh/mvn-lib-ansi-logger/releases/.lastUpdated=1655576869313
+https\://raw.github.com/Frejdh/mvn-lib-network-toolbox/releases/.lastUpdated=1655576870191
+https\://repo1.maven.org/maven2/.error=
+https\://raw.github.com/Frejdh/mvn-lib-master/releases/.error=
+https\://raw.github.com/Frejdh/mvn-lib-thread-executor/mvn-repo/.lastUpdated=1655576870997
+https\://raw.github.com/Frejdh/mvn-lib-dependency-versions/releases/.error=
+https\://raw.github.com/Frejdh/mvn-lib-configurator/releases/.lastUpdated=1655576870448
+https\://raw.github.com/Frejdh/mvn-lib-thread-executor/mvn-repo/.error=
+https\://repo1.maven.org/maven2/.lastUpdated=1655576867989
+https\://raw.github.com/Frejdh/mvn-lib-job-queuing/releases/.lastUpdated=1655576869593
+https\://repo.eclipse.org/content/groups/releases/.lastUpdated=1655576868126
+https\://raw.github.com/Frejdh/mvn-lib-dependency-versions/releases/.lastUpdated=1655576871263
+https\://raw.github.com/Frejdh/mvn-lib-configurator/releases/.error=
+https\://raw.github.com/Frejdh/mvn-lib-common-toolbox/releases/.lastUpdated=1655576869876
+https\://raw.github.com/Frejdh/mvn-lib-job-queuing/releases/.error=

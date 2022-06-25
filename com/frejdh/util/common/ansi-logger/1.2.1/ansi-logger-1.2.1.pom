@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.frejdh</groupId>
+        <artifactId>master-pom</artifactId>
+        <version>2.1.0</version>
+    </parent>
+
+    <groupId>com.frejdh.util.common</groupId>
+    <artifactId>ansi-logger</artifactId>
+    <version>1.2.1</version>
+    <packaging>jar</packaging>
+
+    <properties>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+
+        <!-- Deployment for artifacts -->
+        <github.repository.owner>Frejdh</github.repository.owner>
+        <github.repository.name>mvn-lib-ansi-logger</github.repository.name>
+
+        <jcolor.version>5.2.0</jcolor.version>
+        <frejdh.common-toolbox.version>1.2.0</frejdh.common-toolbox.version>
+        <frejdh.configurator.version>2.1.0</frejdh.configurator.version>
+    </properties>
+
+    <dependencies>
+        <dependency> <!-- Colored output -->
+            <groupId>com.diogonunes</groupId>
+            <artifactId>JColor</artifactId>
+            <version>${jcolor.version}</version>
+        </dependency>
+
+        <dependency> <!-- My toolbox -->
+            <groupId>com.frejdh.util.common</groupId>
+            <artifactId>common-toolbox</artifactId>
+            <version>${frejdh.common-toolbox.version}</version>
+        </dependency>
+
+        <dependency> <!-- Configurator -->
+            <groupId>com.frejdh.util.environment</groupId>
+            <artifactId>configurator-service</artifactId>
+            <version>${frejdh.configurator.version}</version>
+        </dependency>
+
+		<dependency> <!-- Configurator (test utils) -->
+			<groupId>com.frejdh.util.environment</groupId>
+			<artifactId>configurator-test-helper</artifactId>
+			<version>${frejdh.configurator.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+        <dependency> <!-- Validate properties -->
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+        </dependency>
+
+        <dependency> <!-- Used for its ansi objects -->
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <version>1.10.19</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <forceJavacCompilerUse>true</forceJavacCompilerUse>
+                </configuration>
+            </plugin>
+
+            <plugin> <!-- Optional. Push artifact and files to github upon mvn deploy -->
+                <inherited>false</inherited>
+                <groupId>com.github.github</groupId>
+                <artifactId>site-maven-plugin</artifactId>
+                <version>0.11</version>
+
+                <executions> <!-- run site-maven-plugin's 'site' target as part of the build's normal 'deploy' phase -->
+                    <execution> <!-- Package and push .jar file as a release, available for direct download on github -->
+                        <id>github-site-to-artifact</id>
+                        <goals>
+                            <goal>site</goal>
+                        </goals>
+                        <phase>deploy</phase>
+                        <configuration>
+                            <message>Maven artifact for ${project.version}</message> <!-- Git commit message -->
+                            <noJekyll>true</noJekyll><!-- Disable webpage processing -->
+                            <outputDirectory>${project.build.directory}/${github.deploy.branch}</outputDirectory> <!-- Matches distribution management repository url above -->
+                            <branch>${github.ref.release.jar}/${project.version}</branch> <!-- Remote branch name (maven repository) -->
+                            <includes>
+                                <include>**/*</include>
+                            </includes>
+                            <repositoryOwner>${github.repository.owner}</repositoryOwner> <!-- Organization or username  -->
+                            <repositoryName>${github.repository.name}</repositoryName> <!-- Github repo name -->
+                        </configuration>
+                    </execution>
+
+                    <execution> <!-- Upload files to a specific branch used as a maven repository -->
+                        <id>github-site-to-branch</id>
+                        <goals>
+                            <goal>site</goal>
+                        </goals>
+                        <phase>deploy</phase>
+                        <configuration>
+                            <message>Maven artifact for ${project.version}</message> <!-- Git commit message -->
+                            <noJekyll>true</noJekyll><!-- Disable webpage processing -->
+                            <outputDirectory>${project.build.directory}/${github.deploy.branch}</outputDirectory> <!-- Matches distribution management repository url above -->
+                            <branch>${github.ref.release.branch}/${github.deploy.branch}</branch> <!-- Remote branch name (maven repository) -->
+                            <includes>
+                                <include>**/*</include>
+                            </includes>
+                            <repositoryOwner>${github.repository.owner}</repositoryOwner> <!-- Organization or username  -->
+                            <repositoryName>${github.repository.name}</repositoryName> <!-- Github repo name -->
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <repositories>
+        <repository>
+            <id>library-master-pom</id>
+            <url>https://raw.github.com/Frejdh/mvn-lib-master/releases/</url>
+        </repository>
+        <repository>
+            <id>mvn-lib-common-toolbox</id>
+            <url>https://raw.github.com/Frejdh/mvn-lib-common-toolbox/releases/</url>
+        </repository>
+        <repository>
+            <id>mvn-lib-configurator</id>
+            <url>https://raw.github.com/Frejdh/mvn-lib-configurator/releases/</url>
+        </repository>
+    </repositories>
+</project>
